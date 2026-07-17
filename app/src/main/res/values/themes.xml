@@ -1,9 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
     <style name="Base.Theme.MotoCare" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <!-- Cores principais -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Fundo -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+
+        <!-- Barra de status -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+
+        <!-- Barra de navegação -->
+        <item name="android:navigationBarColor">@color/primary</item>
+
     </style>
 
-    <style name="Theme.MotoCare" parent="Base.Theme.MotoCare" />
+    <style name="Theme.MotoCare" parent="Base.Theme.MotoCare"/>
+
 </resources>
