@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_lg">
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="340dp"
+        android:layout_height="205dp"
+        android:contentDescription="@string/app_name"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo_motocare" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtMoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Moto"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtCare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Care"
+            android:textColor="@color/primary_green"
+            android:textSize="40sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtSubtitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:gravity="center"
+        android:text="SEU PARCEIRO NO CUIDADO DA SUA\nMOTOCICLETA"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:textStyle="normal" />
+
+</LinearLayout>

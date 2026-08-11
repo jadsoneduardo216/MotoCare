@@ -20,14 +20,12 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
         </activity>
 
-
-        <!-- Tela principal (sem ser launcher) -->
+        <!-- Tela principal -->
         <activity
             android:name=".activities.MainActivity"
             android:exported="false" />

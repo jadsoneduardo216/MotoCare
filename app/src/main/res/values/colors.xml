@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Cores principais -->
-    <color name="primary">#1565C0</color>
-    <color name="primary_dark">#0D47A1</color>
-    <color name="primary_light">#42A5F5</color>
+    <!-- Identidade visual MotoCare -->
 
-    <!-- Cor de destaque -->
-    <color name="accent">#FF6F00</color>
+    <!-- Azul principal -->
+    <color name="primary">#061A30</color>
+    <color name="primary_dark">#020811</color>
+    <color name="primary_light">#123A5A</color>
 
-    <!-- Fundo -->
-    <color name="background">#F8F9FA</color>
-    <color name="surface">#FFFFFF</color>
+    <!-- Verde de destaque -->
+    <color name="primary_green">#39D353</color>
+    <color name="accent">#39D353</color>
 
-    <!-- Texto -->
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#616161</color>
+    <!-- Fundos -->
+    <color name="background">#020811</color>
+    <color name="surface">#061A30</color>
+
+    <!-- Textos -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B8C7D9</color>
 
     <!-- Estados -->
-    <color name="success">#2E7D32</color>
+    <color name="success">#39D353</color>
     <color name="warning">#F9A825</color>
-    <color name="error">#C62828</color>
+    <color name="error">#EF5350</color>
 
-    <!-- Branco e preto -->
+    <!-- Básicas -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 
