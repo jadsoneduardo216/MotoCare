@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- CABEÇALHO -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnVoltar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:text="‹"
+                android:textColor="@color/white"
+                android:textSize="36sp"
+                android:background="@drawable/bg_button_icon" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:text="Cadastrar motocicleta"
+                android:textColor="@color/white"
+                android:textSize="23sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <!-- ÍCONE -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="🏍️"
+            android:textSize="60sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Vamos conhecer sua moto"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="Preencha os dados abaixo para começar."
+            android:textColor="#B8C5D1"
+            android:textSize="14sp" />
+
+
+        <!-- APELIDO -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="Apelido da moto"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtApelido"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_motocare"
+            android:hint="Ex.: Minha CG"
+            android:inputType="textCapSentences"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/white"
+            android:textColorHint="#8FA1B2"
+            android:textSize="15sp" />
+
+
+        <!-- MARCA -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Marca"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtMarca"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_motocare"
+            android:hint="Ex.: Honda"
+            android:inputType="textCapWords"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/white"
+            android:textColorHint="#8FA1B2"
+            android:textSize="15sp" />
+
+
+        <!-- MODELO -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Modelo"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtModelo"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_motocare"
+            android:hint="Ex.: CG 160 Titan"
+            android:inputType="textCapWords"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/white"
+            android:textColorHint="#8FA1B2"
+            android:textSize="15sp" />
+
+
+        <!-- ANO -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Ano"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtAno"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_motocare"
+            android:hint="Ex.: 2024"
+            android:inputType="number"
+            android:maxLength="4"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/white"
+            android:textColorHint="#8FA1B2"
+            android:textSize="15sp" />
+
+
+        <!-- PLACA -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Placa"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtPlaca"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_motocare"
+            android:hint="Ex.: ABC1D23"
+            android:inputType="textCapCharacters"
+            android:maxLength="7"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/white"
+            android:textColorHint="#8FA1B2"
+            android:textSize="15sp" />
+
+
+        <!-- QUILOMETRAGEM -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Quilometragem atual"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtQuilometragem"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_motocare"
+            android:hint="Ex.: 32450"
+            android:inputType="number"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/white"
+            android:textColorHint="#8FA1B2"
+            android:textSize="15sp" />
+
+
+        <!-- BOTÃO SALVAR -->
+
+        <TextView
+            android:id="@+id/btnSalvarMoto"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:text="SALVAR MOTOCICLETA"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</ScrollView>

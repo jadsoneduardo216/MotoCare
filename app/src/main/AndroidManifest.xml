@@ -30,6 +30,12 @@
             android:name=".activities.MainActivity"
             android:exported="false" />
 
+        <!-- Tela de cadastro da motocicleta -->
+        <activity
+            android:name=".activities.CadastroMotoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>
