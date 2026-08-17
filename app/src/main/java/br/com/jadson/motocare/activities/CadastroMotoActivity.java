@@ -2,6 +2,7 @@ package br.com.jadson.motocare.activities;
 
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,8 +20,7 @@ public class CadastroMotoActivity extends AppCompatActivity {
     private EditText edtQuilometragem;
 
     private TextView btnSalvarMoto;
-    private TextView btnVoltar;
-
+    private ImageView btnVoltar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
