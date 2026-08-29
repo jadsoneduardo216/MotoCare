@@ -25,6 +25,16 @@
 
         </activity>
 
+        <!-- Tela de login -->
+        <activity
+            android:name=".activities.LoginActivity"
+            android:exported="false" />
+
+        <!-- Tela de cadastro de usuário -->
+        <activity
+            android:name=".activities.CadastroUsuarioActivity"
+            android:exported="false" />
+
         <!-- Tela principal -->
         <activity
             android:name=".activities.MainActivity"

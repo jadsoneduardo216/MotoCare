@@ -22,11 +22,13 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_splash);
 
         ViewCompat.setOnApplyWindowInsetsListener(
                 findViewById(R.id.main),
                 (v, insets) -> {
+
                     Insets systemBars = insets.getInsets(
                             WindowInsetsCompat.Type.systemBars()
                     );
@@ -42,16 +44,27 @@ public class SplashActivity extends AppCompatActivity {
                 }
         );
 
+        // Aguarda 2,5 segundos e abre o Login.
+        // Durante o desenvolvimento, o aplicativo
+        // sempre começará pela tela de Login.
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
 
-            Intent intent = new Intent(
-                    SplashActivity.this,
-                    MainActivity.class
-            );
-
-            startActivity(intent);
-            finish();
+            abrirLoginActivity();
 
         }, SPLASH_DURATION);
+    }
+
+    private void abrirLoginActivity() {
+
+        Intent intent = new Intent(
+                SplashActivity.this,
+                LoginActivity.class
+        );
+
+        startActivity(intent);
+
+        // Encerra a Splash para que ela não fique
+        // na pilha de navegação.
+        finish();
     }
 }

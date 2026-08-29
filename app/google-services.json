@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "796759790951",
+    "project_id": "motocare-2658b",
+    "storage_bucket": "motocare-2658b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:796759790951:android:a3a9512493d1005f644bc2",
+        "android_client_info": {
+          "package_name": "br.com.jadson.motocare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxY9uJZkVILn7hmV2cbDKu05Z-j6lGJ0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
