@@ -9,6 +9,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import br.com.jadson.motocare.R;
 
@@ -23,6 +26,7 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
     private TextView btnVoltarLogin;
 
     private FirebaseAuth firebaseAuth;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,10 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
         inicializarViews();
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        databaseReference = FirebaseDatabase
+                .getInstance()
+                .getReference("usuarios");
 
         configurarBotoes();
     }
@@ -90,13 +98,14 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
             return;
         }
 
-        // Confirma a senha
+        // Verifica confirmação da senha
         if (TextUtils.isEmpty(confirmarSenha)) {
             edtConfirmarSenha.setError("Confirme sua senha");
             edtConfirmarSenha.requestFocus();
             return;
         }
 
+        // Verifica se as senhas são iguais
         if (!senha.equals(confirmarSenha)) {
             edtConfirmarSenha.setError("As senhas não coincidem");
             edtConfirmarSenha.requestFocus();
@@ -105,23 +114,68 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
 
         btnCriarConta.setEnabled(false);
 
+        // Cria a conta no Firebase Authentication
         firebaseAuth
                 .createUserWithEmailAndPassword(email, senha)
                 .addOnCompleteListener(task -> {
 
-                    btnCriarConta.setEnabled(true);
-
                     if (task.isSuccessful()) {
 
-                        Toast.makeText(
-                                this,
-                                "Conta criada com sucesso!",
-                                Toast.LENGTH_LONG
-                        ).show();
+                        FirebaseUser usuario = firebaseAuth.getCurrentUser();
 
-                        finish();
+                        if (usuario != null) {
+
+                            String uid = usuario.getUid();
+
+                            // Cria os dados do usuário
+                            Usuario usuarioDados = new Usuario(
+                                    uid,
+                                    nome,
+                                    email
+                            );
+
+                            // Salva no Realtime Database
+                            databaseReference
+                                    .child(uid)
+                                    .setValue(usuarioDados)
+                                    .addOnCompleteListener(databaseTask -> {
+
+                                        btnCriarConta.setEnabled(true);
+
+                                        if (databaseTask.isSuccessful()) {
+
+                                            Toast.makeText(
+                                                    this,
+                                                    "Conta criada com sucesso!",
+                                                    Toast.LENGTH_LONG
+                                            ).show();
+
+                                            finish();
+
+                                        } else {
+
+                                            Toast.makeText(
+                                                    this,
+                                                    "Conta criada, mas não foi possível salvar seus dados.",
+                                                    Toast.LENGTH_LONG
+                                            ).show();
+                                        }
+                                    });
+
+                        } else {
+
+                            btnCriarConta.setEnabled(true);
+
+                            Toast.makeText(
+                                    this,
+                                    "Não foi possível obter os dados do usuário.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
 
                     } else {
+
+                        btnCriarConta.setEnabled(true);
 
                         Toast.makeText(
                                 this,
