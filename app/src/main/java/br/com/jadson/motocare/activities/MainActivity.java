@@ -1,11 +1,15 @@
 package br.com.jadson.motocare.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -13,6 +17,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -27,13 +36,26 @@ public class MainActivity extends AppCompatActivity {
     private TextView txtNenhumaMoto;
     private TextView txtDescricaoMoto;
 
+    private LinearLayout cardMotocicleta;
+
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference usuariosReference;
+
     private MotoDao motoDao;
+
+    private List<Motocicleta> motosUsuario;
+
+    private SharedPreferences preferences;
+
+    private static final String PREFS_NAME = "MotoCarePrefs";
+    private static final String KEY_MOTO_ATIVA = "moto_ativa";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_main);
 
         ViewCompat.setOnApplyWindowInsetsListener(
@@ -57,22 +79,37 @@ public class MainActivity extends AppCompatActivity {
 
         inicializarViews();
 
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        usuariosReference = FirebaseDatabase
+                .getInstance()
+                .getReference("usuarios");
+
         motoDao = new MotoDao(this);
+
+        preferences = getSharedPreferences(
+                PREFS_NAME,
+                MODE_PRIVATE
+        );
 
         configurarBotoes();
 
-        carregarUsuario();
+        carregarNomeUsuario();
 
         carregarMotocicleta();
     }
 
     private void inicializarViews() {
 
+        txtSaudacao = findViewById(R.id.txtSaudacao);
+
+        txtNenhumaMoto = findViewById(R.id.txtNenhumaMoto);
+
+        txtDescricaoMoto = findViewById(R.id.txtDescricaoMoto);
+
         btnAdicionarMoto = findViewById(R.id.btnAdicionarMoto);
 
-        txtSaudacao = findViewById(R.id.txtSaudacao);
-        txtNenhumaMoto = findViewById(R.id.txtNenhumaMoto);
-        txtDescricaoMoto = findViewById(R.id.txtDescricaoMoto);
+        cardMotocicleta = findViewById(R.id.cardMotocicleta);
     }
 
     private void configurarBotoes() {
@@ -86,63 +123,272 @@ public class MainActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
-    }
 
-    /**
-     * Carrega o nome do usuário logado.
-     */
-    private void carregarUsuario() {
+        /*
+         * Ao tocar no card da motocicleta,
+         * o usuário poderá escolher outra moto.
+         */
+        cardMotocicleta.setOnClickListener(v -> {
 
-        FirebaseUser usuarioAtual =
-                FirebaseAuth.getInstance().getCurrentUser();
+            if (motosUsuario != null && !motosUsuario.isEmpty()) {
 
-        if (usuarioAtual != null) {
-
-            String nome = usuarioAtual.getDisplayName();
-
-            if (nome != null && !nome.trim().isEmpty()) {
-
-                txtSaudacao.setText(
-                        "Olá, " + nome + "!"
-                );
+                mostrarSeletorDeMotocicleta();
 
             } else {
 
-                txtSaudacao.setText("Olá!");
+                Toast.makeText(
+                        MainActivity.this,
+                        "Cadastre uma motocicleta primeiro.",
+                        Toast.LENGTH_SHORT
+                ).show();
             }
-        }
+        });
     }
 
     /**
-     * Busca as motocicletas do usuário no SQLite.
+     * Carrega o nome do usuário atualmente autenticado.
      */
-    private void carregarMotocicleta() {
+    private void carregarNomeUsuario() {
 
         FirebaseUser usuarioAtual =
-                FirebaseAuth.getInstance().getCurrentUser();
+                firebaseAuth.getCurrentUser();
 
         if (usuarioAtual == null) {
+
+            txtSaudacao.setText("Olá!");
+
             return;
         }
 
         String uid = usuarioAtual.getUid();
 
-        List<Motocicleta> motos =
-                motoDao.listarPorUsuario(uid);
+        usuariosReference
+                .child(uid)
+                .child("nome")
+                .addListenerForSingleValueEvent(
+                        new ValueEventListener() {
 
-        if (motos.isEmpty()) {
+                            @Override
+                            public void onDataChange(
+                                    @NonNull DataSnapshot snapshot
+                            ) {
 
-            mostrarSemMotocicleta();
+                                String nome =
+                                        snapshot.getValue(String.class);
 
-        } else {
+                                if (nome != null
+                                        && !nome.trim().isEmpty()) {
 
-            // Por enquanto mostramos a primeira moto.
-            mostrarMotocicleta(motos.get(0));
-        }
+                                    txtSaudacao.setText(
+                                            "Olá, " + nome + "!"
+                                    );
+
+                                } else {
+
+                                    txtSaudacao.setText("Olá!");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(
+                                    @NonNull DatabaseError error
+                            ) {
+
+                                txtSaudacao.setText("Olá!");
+
+                                Toast.makeText(
+                                        MainActivity.this,
+                                        "Não foi possível carregar o nome do usuário.",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                );
     }
 
     /**
-     * Mostra o estado quando não existe moto cadastrada.
+     * Carrega todas as motocicletas do usuário.
+     *
+     * Depois identifica qual delas está marcada
+     * como motocicleta ativa.
+     */
+    private void carregarMotocicleta() {
+
+        FirebaseUser usuarioAtual =
+                firebaseAuth.getCurrentUser();
+
+        if (usuarioAtual == null) {
+
+            motosUsuario = null;
+
+            mostrarSemMotocicleta();
+
+            return;
+        }
+
+        String uid = usuarioAtual.getUid();
+
+        motosUsuario =
+                motoDao.listarPorUsuario(uid);
+
+        if (motosUsuario.isEmpty()) {
+
+            mostrarSemMotocicleta();
+
+            return;
+        }
+
+        String idMotoAtiva =
+                preferences.getString(
+                        KEY_MOTO_ATIVA,
+                        null
+                );
+
+        Motocicleta motoAtiva = null;
+
+        /*
+         * Primeiro tentamos encontrar a moto
+         * que o usuário escolheu anteriormente.
+         */
+        if (idMotoAtiva != null) {
+
+            for (Motocicleta moto : motosUsuario) {
+
+                if (idMotoAtiva.equals(moto.getId())) {
+
+                    motoAtiva = moto;
+
+                    break;
+                }
+            }
+        }
+
+        /*
+         * Se não houver uma moto selecionada,
+         * usamos a primeira cadastrada.
+         */
+        if (motoAtiva == null) {
+
+            motoAtiva = motosUsuario.get(0);
+
+            salvarMotoAtiva(motoAtiva);
+        }
+
+        mostrarMotocicleta(motoAtiva);
+    }
+
+    /**
+     * Abre a caixa de seleção das motocicletas.
+     */
+    private void mostrarSeletorDeMotocicleta() {
+
+        if (motosUsuario == null
+                || motosUsuario.isEmpty()) {
+
+            return;
+        }
+
+        String[] nomesMotos =
+                new String[motosUsuario.size()];
+
+        String idMotoAtiva =
+                preferences.getString(
+                        KEY_MOTO_ATIVA,
+                        null
+                );
+
+        int motoSelecionada = 0;
+
+        for (int i = 0; i < motosUsuario.size(); i++) {
+
+            Motocicleta moto = motosUsuario.get(i);
+
+            nomesMotos[i] =
+                    moto.getApelido()
+                            + "\n"
+                            + moto.getMarca()
+                            + " "
+                            + moto.getModelo()
+                            + " • "
+                            + moto.getAno();
+
+            if (idMotoAtiva != null
+                    && idMotoAtiva.equals(moto.getId())) {
+
+                motoSelecionada = i;
+            }
+        }
+
+        AlertDialog dialog =
+                new AlertDialog.Builder(this)
+                        .setTitle("Selecionar motocicleta")
+                        .setSingleChoiceItems(
+                                nomesMotos,
+                                motoSelecionada,
+                                null
+                        )
+                        .setNegativeButton(
+                                "Cancelar",
+                                null
+                        )
+                        .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+
+            android.widget.ListView listView =
+                    dialog.getListView();
+
+            listView.setOnItemClickListener(
+                    (parent, view, position, id) -> {
+
+                        Motocicleta motoEscolhida =
+                                motosUsuario.get(position);
+
+                        salvarMotoAtiva(motoEscolhida);
+
+                        mostrarMotocicleta(
+                                motoEscolhida
+                        );
+
+                        dialog.dismiss();
+
+                        Toast.makeText(
+                                MainActivity.this,
+                                "Motocicleta selecionada: "
+                                        + motoEscolhida.getApelido(),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+            );
+        });
+
+        dialog.show();
+    }
+
+    /**
+     * Salva o ID da motocicleta atualmente ativa.
+     */
+    private void salvarMotoAtiva(Motocicleta moto) {
+
+        if (moto == null
+                || moto.getId() == null
+                || moto.getId().trim().isEmpty()) {
+
+            return;
+        }
+
+        preferences
+                .edit()
+                .putString(
+                        KEY_MOTO_ATIVA,
+                        moto.getId()
+                )
+                .apply();
+    }
+
+    /**
+     * Exibe o estado da Home quando não existe
+     * nenhuma motocicleta cadastrada.
      */
     private void mostrarSemMotocicleta() {
 
@@ -160,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Mostra os dados da motocicleta.
+     * Exibe os dados da motocicleta ativa.
      */
     private void mostrarMotocicleta(Motocicleta moto) {
 
@@ -186,21 +432,31 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Atualiza a motocicleta exibida quando
+     * retornamos da tela de cadastro.
+     */
     @Override
     protected void onResume() {
+
         super.onResume();
 
-        // Atualiza o card quando voltamos do cadastro.
         if (motoDao != null) {
+
             carregarMotocicleta();
         }
     }
 
+    /**
+     * Fecha corretamente a conexão do SQLite.
+     */
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
 
         if (motoDao != null) {
+
             motoDao.fechar();
         }
     }
