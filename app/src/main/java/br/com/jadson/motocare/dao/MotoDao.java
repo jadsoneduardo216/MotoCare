@@ -24,11 +24,16 @@ public class MotoDao {
      *
      * A moto começa como NÃO sincronizada.
      */
-    public boolean inserir(Motocicleta moto, String uidUsuario) {
+    public boolean inserir(
+            Motocicleta moto,
+            String uidUsuario
+    ) {
 
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        SQLiteDatabase db =
+                databaseHelper.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
+        ContentValues values =
+                new ContentValues();
 
         values.put(
                 MotoDatabaseHelper.COL_ID,
@@ -76,11 +81,12 @@ public class MotoDao {
                 0
         );
 
-        long resultado = db.insert(
-                MotoDatabaseHelper.TABLE_MOTOS,
-                null,
-                values
-        );
+        long resultado =
+                db.insert(
+                        MotoDatabaseHelper.TABLE_MOTOS,
+                        null,
+                        values
+                );
 
         db.close();
 
@@ -88,39 +94,49 @@ public class MotoDao {
     }
 
     /**
-     * Marca a motocicleta como sincronizada.
+     * Busca uma motocicleta específica pelo ID.
      */
-    public boolean marcarComoSincronizada(String idMoto) {
+    public Motocicleta buscarPorId(String idMoto) {
 
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        SQLiteDatabase db =
+                databaseHelper.getReadableDatabase();
 
-        ContentValues values = new ContentValues();
-
-        values.put(
-                MotoDatabaseHelper.COL_SINCRONIZADO,
-                1
-        );
-
-        int resultado = db.update(
+        Cursor cursor = db.query(
                 MotoDatabaseHelper.TABLE_MOTOS,
-                values,
+                null,
                 MotoDatabaseHelper.COL_ID + " = ?",
-                new String[]{idMoto}
+                new String[]{idMoto},
+                null,
+                null,
+                null,
+                "1"
         );
 
+        Motocicleta moto = null;
+
+        if (cursor.moveToFirst()) {
+
+            moto = criarMotocicletaAPartirDoCursor(cursor);
+        }
+
+        cursor.close();
         db.close();
 
-        return resultado > 0;
+        return moto;
     }
 
     /**
      * Busca todas as motocicletas de um usuário.
      */
-    public List<Motocicleta> listarPorUsuario(String uidUsuario) {
+    public List<Motocicleta> listarPorUsuario(
+            String uidUsuario
+    ) {
 
-        List<Motocicleta> lista = new ArrayList<>();
+        List<Motocicleta> lista =
+                new ArrayList<>();
 
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        SQLiteDatabase db =
+                databaseHelper.getReadableDatabase();
 
         Cursor cursor = db.query(
                 MotoDatabaseHelper.TABLE_MOTOS,
@@ -136,57 +152,8 @@ public class MotoDao {
 
             do {
 
-                String id = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                                MotoDatabaseHelper.COL_ID
-                        )
-                );
-
-                String apelido = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                                MotoDatabaseHelper.COL_APELIDO
-                        )
-                );
-
-                String marca = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                                MotoDatabaseHelper.COL_MARCA
-                        )
-                );
-
-                String modelo = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                                MotoDatabaseHelper.COL_MODELO
-                        )
-                );
-
-                String ano = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                                MotoDatabaseHelper.COL_ANO
-                        )
-                );
-
-                String placa = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                                MotoDatabaseHelper.COL_PLACA
-                        )
-                );
-
-                String quilometragem = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                                MotoDatabaseHelper.COL_QUILOMETRAGEM
-                        )
-                );
-
-                Motocicleta moto = new Motocicleta(
-                        id,
-                        apelido,
-                        marca,
-                        modelo,
-                        ano,
-                        placa,
-                        quilometragem
-                );
+                Motocicleta moto =
+                        criarMotocicletaAPartirDoCursor(cursor);
 
                 lista.add(moto);
 
@@ -200,34 +167,131 @@ public class MotoDao {
     }
 
     /**
-     * Atualiza a quilometragem.
+     * Atualiza todos os dados de uma motocicleta.
+     *
+     * Depois de qualquer alteração local,
+     * a moto volta para NÃO sincronizada.
+     */
+    public boolean atualizar(Motocicleta moto) {
+
+        SQLiteDatabase db =
+                databaseHelper.getWritableDatabase();
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(
+                MotoDatabaseHelper.COL_APELIDO,
+                moto.getApelido()
+        );
+
+        values.put(
+                MotoDatabaseHelper.COL_MARCA,
+                moto.getMarca()
+        );
+
+        values.put(
+                MotoDatabaseHelper.COL_MODELO,
+                moto.getModelo()
+        );
+
+        values.put(
+                MotoDatabaseHelper.COL_ANO,
+                moto.getAno()
+        );
+
+        values.put(
+                MotoDatabaseHelper.COL_PLACA,
+                moto.getPlaca()
+        );
+
+        values.put(
+                MotoDatabaseHelper.COL_QUILOMETRAGEM,
+                moto.getQuilometragem()
+        );
+
+        // A alteração precisa ser sincronizada novamente.
+        values.put(
+                MotoDatabaseHelper.COL_SINCRONIZADO,
+                0
+        );
+
+        int resultado =
+                db.update(
+                        MotoDatabaseHelper.TABLE_MOTOS,
+                        values,
+                        MotoDatabaseHelper.COL_ID + " = ?",
+                        new String[]{moto.getId()}
+                );
+
+        db.close();
+
+        return resultado > 0;
+    }
+
+    /**
+     * Marca a motocicleta como sincronizada.
+     */
+    public boolean marcarComoSincronizada(
+            String idMoto
+    ) {
+
+        SQLiteDatabase db =
+                databaseHelper.getWritableDatabase();
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(
+                MotoDatabaseHelper.COL_SINCRONIZADO,
+                1
+        );
+
+        int resultado =
+                db.update(
+                        MotoDatabaseHelper.TABLE_MOTOS,
+                        values,
+                        MotoDatabaseHelper.COL_ID + " = ?",
+                        new String[]{idMoto}
+                );
+
+        db.close();
+
+        return resultado > 0;
+    }
+
+    /**
+     * Atualiza somente a quilometragem.
      */
     public boolean atualizarQuilometragem(
             String idMoto,
             String novaQuilometragem
     ) {
 
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        SQLiteDatabase db =
+                databaseHelper.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
+        ContentValues values =
+                new ContentValues();
 
         values.put(
                 MotoDatabaseHelper.COL_QUILOMETRAGEM,
                 novaQuilometragem
         );
 
-        // Alterou localmente, então precisa sincronizar novamente.
+        // Alterou localmente.
         values.put(
                 MotoDatabaseHelper.COL_SINCRONIZADO,
                 0
         );
 
-        int resultado = db.update(
-                MotoDatabaseHelper.TABLE_MOTOS,
-                values,
-                MotoDatabaseHelper.COL_ID + " = ?",
-                new String[]{idMoto}
-        );
+        int resultado =
+                db.update(
+                        MotoDatabaseHelper.TABLE_MOTOS,
+                        values,
+                        MotoDatabaseHelper.COL_ID + " = ?",
+                        new String[]{idMoto}
+                );
 
         db.close();
 
@@ -239,13 +303,15 @@ public class MotoDao {
      */
     public boolean excluir(String idMoto) {
 
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        SQLiteDatabase db =
+                databaseHelper.getWritableDatabase();
 
-        int resultado = db.delete(
-                MotoDatabaseHelper.TABLE_MOTOS,
-                MotoDatabaseHelper.COL_ID + " = ?",
-                new String[]{idMoto}
-        );
+        int resultado =
+                db.delete(
+                        MotoDatabaseHelper.TABLE_MOTOS,
+                        MotoDatabaseHelper.COL_ID + " = ?",
+                        new String[]{idMoto}
+                );
 
         db.close();
 
@@ -253,9 +319,78 @@ public class MotoDao {
     }
 
     /**
+     * Cria um objeto Motocicleta a partir
+     * dos dados encontrados no Cursor.
+     */
+    private Motocicleta criarMotocicletaAPartirDoCursor(
+            Cursor cursor
+    ) {
+
+        String id =
+                cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                                MotoDatabaseHelper.COL_ID
+                        )
+                );
+
+        String apelido =
+                cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                                MotoDatabaseHelper.COL_APELIDO
+                        )
+                );
+
+        String marca =
+                cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                                MotoDatabaseHelper.COL_MARCA
+                        )
+                );
+
+        String modelo =
+                cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                                MotoDatabaseHelper.COL_MODELO
+                        )
+                );
+
+        String ano =
+                cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                                MotoDatabaseHelper.COL_ANO
+                        )
+                );
+
+        String placa =
+                cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                                MotoDatabaseHelper.COL_PLACA
+                        )
+                );
+
+        String quilometragem =
+                cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                                MotoDatabaseHelper.COL_QUILOMETRAGEM
+                        )
+                );
+
+        return new Motocicleta(
+                id,
+                apelido,
+                marca,
+                modelo,
+                ano,
+                placa,
+                quilometragem
+        );
+    }
+
+    /**
      * Fecha o banco.
      */
     public void fechar() {
+
         databaseHelper.close();
     }
 }
