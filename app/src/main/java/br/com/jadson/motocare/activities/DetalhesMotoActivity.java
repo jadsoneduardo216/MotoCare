@@ -7,10 +7,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.List;
 
 import br.com.jadson.motocare.R;
 import br.com.jadson.motocare.dao.MotoDao;
@@ -25,6 +30,7 @@ public class DetalhesMotoActivity extends AppCompatActivity {
     private TextView txtPlacaMoto;
     private TextView txtQuilometragemMoto;
     private TextView btnTrocarMoto;
+    private TextView btnExcluirMoto;
 
     private MotoDao motoDao;
 
@@ -75,8 +81,12 @@ public class DetalhesMotoActivity extends AppCompatActivity {
 
         txtQuilometragemMoto =
                 findViewById(R.id.txtQuilometragemMoto);
+
         btnTrocarMoto =
                 findViewById(R.id.btnTrocarMoto);
+
+        btnExcluirMoto =
+                findViewById(R.id.btnExcluirMoto);
     }
 
     /**
@@ -84,7 +94,9 @@ public class DetalhesMotoActivity extends AppCompatActivity {
      */
     private void configurarBotoes() {
 
-        btnVoltarDetalhes.setOnClickListener(v -> finish());
+        btnVoltarDetalhes.setOnClickListener(
+                v -> finish()
+        );
 
         btnTrocarMoto.setOnClickListener(
                 v -> mostrarSeletorDeMotocicleta()
@@ -103,6 +115,178 @@ public class DetalhesMotoActivity extends AppCompatActivity {
 
             startActivity(intent);
         });
+
+        btnExcluirMoto.setOnClickListener(
+                v -> confirmarExclusao()
+        );
+    }
+
+    /**
+     * Exibe uma confirmação antes de excluir
+     * a motocicleta.
+     */
+    private void confirmarExclusao() {
+
+        new AlertDialog.Builder(this)
+                .setTitle("Excluir motocicleta")
+                .setMessage(
+                        "Tem certeza que deseja excluir esta motocicleta?"
+                )
+                .setNegativeButton(
+                        "Cancelar",
+                        null
+                )
+                .setPositiveButton(
+                        "Excluir",
+                        (dialog, which) -> excluirMotocicleta()
+                )
+                .show();
+    }
+
+    /**
+     * Exclui a motocicleta do banco local
+     * e da nuvem.
+     */
+    private void excluirMotocicleta() {
+
+        FirebaseUser usuarioAtual =
+                FirebaseAuth.getInstance().getCurrentUser();
+
+        if (usuarioAtual == null) {
+
+            Toast.makeText(
+                    this,
+                    "Usuário não autenticado.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        String uidUsuario =
+                usuarioAtual.getUid();
+
+        String idMotoAtiva =
+                preferences.getString(
+                        KEY_MOTO_ATIVA,
+                        null
+                );
+
+        if (idMotoAtiva == null
+                || idMotoAtiva.trim().isEmpty()) {
+
+            Toast.makeText(
+                    this,
+                    "Não foi possível identificar a motocicleta.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        /*
+         * Primeiro excluímos do banco local.
+         */
+        boolean excluidaLocalmente =
+                motoDao.excluir(idMotoAtiva);
+
+        if (!excluidaLocalmente) {
+
+            Toast.makeText(
+                    this,
+                    "Não foi possível excluir a motocicleta.",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            return;
+        }
+
+        /*
+         * Verificamos se ainda existem outras
+         * motocicletas cadastradas.
+         */
+        List<Motocicleta> motosRestantes =
+                motoDao.listarPorUsuario(uidUsuario);
+
+        if (!motosRestantes.isEmpty()) {
+
+            /*
+             * Escolhe automaticamente a primeira
+             * motocicleta restante como ativa.
+             */
+            Motocicleta novaMotoAtiva =
+                    motosRestantes.get(0);
+
+            preferences
+                    .edit()
+                    .putString(
+                            KEY_MOTO_ATIVA,
+                            novaMotoAtiva.getId()
+                    )
+                    .apply();
+
+        } else {
+
+            /*
+             * Não existem mais motocicletas.
+             */
+            preferences
+                    .edit()
+                    .remove(KEY_MOTO_ATIVA)
+                    .apply();
+        }
+
+        /*
+         * Agora excluímos a motocicleta do Firebase.
+         */
+        DatabaseReference referenciaMoto =
+                FirebaseDatabase
+                        .getInstance()
+                        .getReference("usuarios")
+                        .child(uidUsuario)
+                        .child("motocicletas")
+                        .child(idMotoAtiva);
+
+        referenciaMoto.removeValue()
+                .addOnCompleteListener(task -> {
+
+                    if (task.isSuccessful()) {
+
+                        Toast.makeText(
+                                DetalhesMotoActivity.this,
+                                "Motocicleta excluída com sucesso!",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                    } else {
+
+                        Toast.makeText(
+                                DetalhesMotoActivity.this,
+                                "Motocicleta removida do aparelho. "
+                                        + "A sincronização com a nuvem "
+                                        + "será concluída quando houver conexão.",
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+
+                    /*
+                     * Volta para a Home.
+                     */
+                    Intent intent =
+                            new Intent(
+                                    DetalhesMotoActivity.this,
+                                    MainActivity.class
+                            );
+
+                    intent.addFlags(
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    );
+
+                    startActivity(intent);
+
+                    finish();
+                });
     }
 
     /**
@@ -181,6 +365,9 @@ public class DetalhesMotoActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Exibe o seletor de motocicletas.
+     */
     private void mostrarSeletorDeMotocicleta() {
 
         FirebaseUser usuarioAtual =
@@ -200,7 +387,7 @@ public class DetalhesMotoActivity extends AppCompatActivity {
         String uidUsuario =
                 usuarioAtual.getUid();
 
-        java.util.List<Motocicleta> motos =
+        List<Motocicleta> motos =
                 motoDao.listarPorUsuario(uidUsuario);
 
         if (motos.isEmpty()) {
@@ -227,7 +414,8 @@ public class DetalhesMotoActivity extends AppCompatActivity {
 
         for (int i = 0; i < motos.size(); i++) {
 
-            Motocicleta moto = motos.get(i);
+            Motocicleta moto =
+                    motos.get(i);
 
             nomesMotos[i] =
                     moto.getApelido()
@@ -245,8 +433,8 @@ public class DetalhesMotoActivity extends AppCompatActivity {
             }
         }
 
-        androidx.appcompat.app.AlertDialog dialog =
-                new androidx.appcompat.app.AlertDialog.Builder(this)
+        AlertDialog dialog =
+                new AlertDialog.Builder(this)
                         .setTitle("Selecionar motocicleta")
                         .setSingleChoiceItems(
                                 nomesMotos,
