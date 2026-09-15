@@ -50,6 +50,23 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "MotoCarePrefs";
     private static final String KEY_MOTO_ATIVA = "moto_ativa";
 
+    private void sincronizarMotosPendentes() {
+
+        FirebaseUser usuarioAtual =
+                FirebaseAuth.getInstance().getCurrentUser();
+
+        if (usuarioAtual == null) {
+            return;
+        }
+
+        MotoSyncManager syncManager =
+                new MotoSyncManager(this);
+
+        syncManager.sincronizarMotos(
+                usuarioAtual.getUid()
+        );
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
                     return insets;
                 }
         );
+
+        sincronizarMotosPendentes();
 
         inicializarViews();
 

@@ -1,5 +1,6 @@
 package br.com.jadson.motocare.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -88,6 +89,20 @@ public class DetalhesMotoActivity extends AppCompatActivity {
         btnTrocarMoto.setOnClickListener(
                 v -> mostrarSeletorDeMotocicleta()
         );
+
+        TextView btnEditarMoto =
+                findViewById(R.id.btnEditarMoto);
+
+        btnEditarMoto.setOnClickListener(v -> {
+
+            Intent intent =
+                    new Intent(
+                            DetalhesMotoActivity.this,
+                            EditarMotoActivity.class
+                    );
+
+            startActivity(intent);
+        });
     }
 
     /**

@@ -51,6 +51,11 @@
             android:name=".activities.DetalhesMotoActivity"
             android:exported="false" />
 
+        <!-- Tela de edição da motocicleta -->
+        <activity
+            android:name=".activities.EditarMotoActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

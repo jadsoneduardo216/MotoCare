@@ -299,6 +299,58 @@ public class MotoDao {
     }
 
     /**
+     * Busca todas as motocicletas que ainda
+     * precisam ser sincronizadas com o Firebase.
+     *
+     * sincronizado = 0 significa que houve
+     * alguma alteração local ainda não enviada
+     * ou confirmada pelo Firebase.
+     */
+    public List<Motocicleta> listarNaoSincronizadas(
+            String uidUsuario
+    ) {
+
+        List<Motocicleta> lista =
+                new ArrayList<>();
+
+        SQLiteDatabase db =
+                databaseHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                MotoDatabaseHelper.TABLE_MOTOS,
+                null,
+                MotoDatabaseHelper.COL_UID_USUARIO
+                        + " = ? AND "
+                        + MotoDatabaseHelper.COL_SINCRONIZADO
+                        + " = ?",
+                new String[]{
+                        uidUsuario,
+                        "0"
+                },
+                null,
+                null,
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+
+            do {
+
+                Motocicleta moto =
+                        criarMotocicletaAPartirDoCursor(cursor);
+
+                lista.add(moto);
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return lista;
+    }
+
+    /**
      * Exclui uma motocicleta.
      */
     public boolean excluir(String idMoto) {
