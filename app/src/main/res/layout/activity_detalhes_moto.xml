@@ -188,6 +188,19 @@
 
         </LinearLayout>
 
+        <!-- BOTÃO TROCAR MOTOCICLETA -->
+
+        <TextView
+            android:id="@+id/btnTrocarMoto"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:text="↔  TROCAR MOTOCICLETA"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <!-- BOTÃO EDITAR -->
 

@@ -132,7 +132,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (motosUsuario != null && !motosUsuario.isEmpty()) {
 
-                mostrarSeletorDeMotocicleta();
+                Intent intent = new Intent(
+                        MainActivity.this,
+                        DetalhesMotoActivity.class
+                );
+
+                startActivity(intent);
 
             } else {
 

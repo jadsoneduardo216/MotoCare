@@ -46,6 +46,11 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- Tela de detalhes da motocicleta -->
+        <activity
+            android:name=".activities.DetalhesMotoActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
