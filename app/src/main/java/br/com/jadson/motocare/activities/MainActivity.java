@@ -245,6 +245,11 @@ public class MainActivity extends AppCompatActivity {
 
             motosUsuario = null;
 
+            preferences
+                    .edit()
+                    .remove(KEY_MOTO_ATIVA)
+                    .apply();
+
             mostrarSemMotocicleta();
 
             return;
@@ -255,7 +260,19 @@ public class MainActivity extends AppCompatActivity {
         motosUsuario =
                 motoDao.listarPorUsuario(uid);
 
+        /*
+         * Não existe nenhuma motocicleta cadastrada.
+         */
         if (motosUsuario.isEmpty()) {
+
+            /*
+             * Remove qualquer ID antigo que possa
+             * ter ficado salvo como moto ativa.
+             */
+            preferences
+                    .edit()
+                    .remove(KEY_MOTO_ATIVA)
+                    .apply();
 
             mostrarSemMotocicleta();
 
