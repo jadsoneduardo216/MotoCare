@@ -16,6 +16,9 @@
 
         <!-- CABEÇALHO -->
 
+
+        <!-- CARD PRINCIPAL -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,9 +46,6 @@
 
         </LinearLayout>
 
-
-        <!-- CARD PRINCIPAL -->
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,10 +57,12 @@
 
             <ImageView
                 android:id="@+id/imgIconeMotoDetalhes"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="140dp"
+                android:layout_height="90dp"
+                android:layout_marginTop="4dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_moto" />
+                android:scaleType="fitCenter"
+                android:src="@drawable/moto_cadastro" />
 
             <TextView
                 android:id="@+id/txtApelidoMoto"
@@ -188,6 +190,33 @@
 
         </LinearLayout>
 
+
+        <!-- ============================== -->
+        <!-- MANUTENÇÃO -->
+        <!-- ============================== -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Manutenção"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnAdicionarManutencao"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:text="+  ADICIONAR MANUTENÇÃO"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+
         <!-- BOTÃO TROCAR MOTOCICLETA -->
 
         <TextView
@@ -201,6 +230,7 @@
             android:textColor="@color/white"
             android:textSize="15sp"
             android:textStyle="bold" />
+
 
         <!-- BOTÃO EDITAR -->
 
@@ -231,6 +261,12 @@
             android:textColor="@color/error"
             android:textSize="15sp"
             android:textStyle="bold" />
+
+        <!-- ESPAÇO EXTRA PARA ROLAR COM O TECLADO ABERTO -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:importantForAccessibility="no" />
 
     </LinearLayout>
 

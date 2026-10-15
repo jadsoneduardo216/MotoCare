@@ -158,6 +158,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutSenha" />
 
+    <!-- BOTÃO ENTRAR COM DIGITAL -->
+    <TextView
+        android:id="@+id/btnEntrarComDigital"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bg_card_action"
+        android:clickable="true"
+        android:focusable="true"
+        android:drawablePadding="10dp"
+        android:gravity="center"
+        android:text="ENTRAR COM DIGITAL"
+        android:textColor="@color/primary_green"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnEntrar" />
+
     <!-- CADASTRO -->
     <TextView
         android:id="@+id/btnCriarConta"
@@ -170,6 +191,6 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnEntrar" />
+        app:layout_constraintTop_toBottomOf="@id/btnEntrarComDigital" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

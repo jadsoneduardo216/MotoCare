@@ -1,3 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">MotoCare</string>
+
+    <string-array name="tipos_manutencao">
+        <item>Selecione o tipo de manutenção</item>
+        <item>Troca de óleo</item>
+        <item>Revisão</item>
+        <item>Relação</item>
+        <item>Pneus</item>
+        <item>Freios</item>
+        <item>Elétrica</item>
+        <item>Motor</item>
+        <item>Suspensão</item>
+        <item>Outros</item>
+    </string-array>
+
 </resources>

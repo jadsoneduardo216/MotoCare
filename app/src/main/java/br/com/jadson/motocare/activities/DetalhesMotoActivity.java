@@ -30,7 +30,9 @@ public class DetalhesMotoActivity extends AppCompatActivity {
     private TextView txtPlacaMoto;
     private TextView txtQuilometragemMoto;
     private TextView btnTrocarMoto;
+    private TextView btnEditarMoto;
     private TextView btnExcluirMoto;
+    private TextView btnAdicionarManutencao;
 
     private MotoDao motoDao;
 
@@ -85,8 +87,14 @@ public class DetalhesMotoActivity extends AppCompatActivity {
         btnTrocarMoto =
                 findViewById(R.id.btnTrocarMoto);
 
+        btnEditarMoto =
+                findViewById(R.id.btnEditarMoto);
+
         btnExcluirMoto =
                 findViewById(R.id.btnExcluirMoto);
+
+        btnAdicionarManutencao =
+                findViewById(R.id.btnAdicionarManutencao);
     }
 
     /**
@@ -102,15 +110,23 @@ public class DetalhesMotoActivity extends AppCompatActivity {
                 v -> mostrarSeletorDeMotocicleta()
         );
 
-        TextView btnEditarMoto =
-                findViewById(R.id.btnEditarMoto);
-
         btnEditarMoto.setOnClickListener(v -> {
 
             Intent intent =
                     new Intent(
                             DetalhesMotoActivity.this,
                             EditarMotoActivity.class
+                    );
+
+            startActivity(intent);
+        });
+
+        btnAdicionarManutencao.setOnClickListener(v -> {
+
+            Intent intent =
+                    new Intent(
+                            DetalhesMotoActivity.this,
+                            CadastroManutencaoActivity.class
                     );
 
             startActivity(intent);
