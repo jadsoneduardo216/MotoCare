@@ -23,7 +23,7 @@ import br.com.jadson.motocare.dao.MotoDao;
 public class DetalhesMotoActivity extends AppCompatActivity {
 
     private ImageView btnVoltarDetalhes;
-
+    private TextView btnHistoricoManutencoes;
     private TextView txtApelidoMoto;
     private TextView txtMarcaModelo;
     private TextView txtAnoMoto;
@@ -95,6 +95,9 @@ public class DetalhesMotoActivity extends AppCompatActivity {
 
         btnAdicionarManutencao =
                 findViewById(R.id.btnAdicionarManutencao);
+
+        btnHistoricoManutencoes =
+                findViewById(R.id.btnHistoricoManutencoes);
     }
 
     /**
@@ -135,6 +138,14 @@ public class DetalhesMotoActivity extends AppCompatActivity {
         btnExcluirMoto.setOnClickListener(
                 v -> confirmarExclusao()
         );
+
+        btnHistoricoManutencoes.setOnClickListener(v -> {
+            Intent intent = new Intent(
+                    DetalhesMotoActivity.this,
+                    HistoricoManutencoesActivity.class
+            );
+            startActivity(intent);
+        });
     }
 
     /**

@@ -1,5 +1,7 @@
 package br.com.jadson.motocare.activities;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import android.app.DatePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -45,14 +47,23 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
 
+    private DatabaseReference databaseReference;
+
+    private String idManutencaoEdicao = null;
+
     private static final String PREFS_NAME = "MotoCarePrefs";
     private static final String KEY_MOTO_ATIVA = "moto_ativa";
+    private static final String EXTRA_ID_MANUTENCAO = "id_manutencao";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_cadastro_manutencao);
+
+        idManutencaoEdicao = getIntent().getStringExtra(
+                EXTRA_ID_MANUTENCAO
+        );
 
         inicializarViews();
 
@@ -65,6 +76,10 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
         );
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        databaseReference = FirebaseDatabase
+                .getInstance()
+                .getReference("usuarios");
 
         configurarBotaoVoltar();
         configurarSpinnerTipoManutencao();
@@ -132,14 +147,13 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
                             this,
                             (view, year, month, dayOfMonth) -> {
 
-                                String dataExibicao =
-                                        String.format(
-                                                Locale.getDefault(),
-                                                "%02d/%02d/%04d",
-                                                dayOfMonth,
-                                                month + 1,
-                                                year
-                                        );
+                                String dataExibicao = String.format(
+                                        Locale.getDefault(),
+                                        "%02d/%02d/%04d",
+                                        dayOfMonth,
+                                        month + 1,
+                                        year
+                                );
 
                                 editDataManutencao.setText(
                                         dataExibicao
@@ -156,11 +170,10 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
 
     private void carregarMotocicleta() {
 
-        String idMotoAtiva =
-                preferences.getString(
-                        KEY_MOTO_ATIVA,
-                        null
-                );
+        String idMotoAtiva = preferences.getString(
+                KEY_MOTO_ATIVA,
+                null
+        );
 
         if (idMotoAtiva == null
                 || idMotoAtiva.trim().isEmpty()) {
@@ -175,8 +188,7 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
             return;
         }
 
-        Motocicleta moto =
-                motoDao.buscarPorId(idMotoAtiva);
+        Motocicleta moto = motoDao.buscarPorId(idMotoAtiva);
 
         if (moto == null) {
 
@@ -191,6 +203,15 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
         }
 
         mostrarDadosMotocicleta(moto);
+
+        if (idManutencaoEdicao != null
+                && !idManutencaoEdicao.trim().isEmpty()) {
+
+            carregarManutencaoParaEdicao(
+                    idManutencaoEdicao,
+                    idMotoAtiva
+            );
+        }
     }
 
     private void mostrarDadosMotocicleta(Motocicleta moto) {
@@ -206,6 +227,93 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
         );
     }
 
+    private void carregarManutencaoParaEdicao(
+            String idManutencao,
+            String idMotoAtiva
+    ) {
+
+        Manutencao manutencao =
+                manutencaoDao.buscarPorId(idManutencao);
+
+        if (manutencao == null
+                || !idMotoAtiva.equals(manutencao.getIdMoto())) {
+
+            Toast.makeText(
+                    this,
+                    "Não foi possível encontrar essa manutenção para a moto selecionada.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+            finish();
+            return;
+        }
+
+        editDescricaoManutencao.setText(
+                manutencao.getDescricao()
+        );
+
+        editQuilometragemManutencao.setText(
+                manutencao.getQuilometragem()
+        );
+
+        editValorManutencao.setText(
+                manutencao.getValor()
+        );
+
+        String dataBanco = manutencao.getData();
+
+        try {
+
+            SimpleDateFormat formatoBanco =
+                    new SimpleDateFormat(
+                            "yyyy-MM-dd",
+                            Locale.US
+                    );
+
+            formatoBanco.setLenient(false);
+
+            Date data = formatoBanco.parse(dataBanco);
+
+            if (data != null) {
+
+                SimpleDateFormat formatoExibicao =
+                        new SimpleDateFormat(
+                                "dd/MM/yyyy",
+                                Locale.getDefault()
+                        );
+
+                editDataManutencao.setText(
+                        formatoExibicao.format(data)
+                );
+            }
+
+        } catch (ParseException e) {
+
+            editDataManutencao.setText(dataBanco);
+        }
+
+        ArrayAdapter<?> adapter =
+                (ArrayAdapter<?>) spinnerTipoManutencao.getAdapter();
+
+        for (int i = 0; i < adapter.getCount(); i++) {
+
+            String tipoLista = adapter.getItem(i).toString();
+
+            if (tipoLista.equalsIgnoreCase(manutencao.getTipo())) {
+
+                spinnerTipoManutencao.setSelection(i);
+                break;
+            }
+        }
+
+        TextView btnSalvar =
+                findViewById(R.id.btnSalvarManutencao);
+
+        btnSalvar.setText("SALVAR ALTERAÇÕES");
+
+        setTitle("Editar manutenção");
+    }
+
     private void configurarBotaoSalvar() {
 
         findViewById(R.id.btnSalvarManutencao)
@@ -214,8 +322,7 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
 
     private void salvarManutencao() {
 
-        FirebaseUser usuario =
-                firebaseAuth.getCurrentUser();
+        FirebaseUser usuario = firebaseAuth.getCurrentUser();
 
         if (usuario == null) {
 
@@ -228,8 +335,10 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
             return;
         }
 
-        String idMoto =
-                preferences.getString(KEY_MOTO_ATIVA, null);
+        String idMoto = preferences.getString(
+                KEY_MOTO_ATIVA,
+                null
+        );
 
         if (idMoto == null || idMoto.trim().isEmpty()) {
 
@@ -242,7 +351,8 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
             return;
         }
 
-        int posicaoTipo = spinnerTipoManutencao.getSelectedItemPosition();
+        int posicaoTipo =
+                spinnerTipoManutencao.getSelectedItemPosition();
 
         if (posicaoTipo == 0) {
 
@@ -291,7 +401,6 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(valorDigitado)) {
 
             editValorManutencao.setError("Informe o valor");
-
             editValorManutencao.requestFocus();
             return;
         }
@@ -301,7 +410,10 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
         try {
 
             SimpleDateFormat formatoExibicao =
-                    new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    new SimpleDateFormat(
+                            "dd/MM/yyyy",
+                            Locale.getDefault()
+                    );
 
             formatoExibicao.setLenient(false);
 
@@ -311,8 +423,18 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
                 throw new ParseException("Data inválida", 0);
             }
 
+            String dataValidada =
+                    formatoExibicao.format(data);
+
+            if (!dataDigitada.equals(dataValidada)) {
+                throw new ParseException("Data inválida", 0);
+            }
+
             SimpleDateFormat formatoBanco =
-                    new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    new SimpleDateFormat(
+                            "yyyy-MM-dd",
+                            Locale.US
+                    );
 
             dataBanco = formatoBanco.format(data);
 
@@ -346,7 +468,11 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
             }
 
             valorNormalizado =
-                    String.format(Locale.US, "%.2f", valorNumerico);
+                    String.format(
+                            Locale.US,
+                            "%.2f",
+                            valorNumerico
+                    );
 
         } catch (NumberFormatException e) {
 
@@ -383,29 +509,98 @@ public class CadastroManutencaoActivity extends AppCompatActivity {
             return;
         }
 
-        Manutencao manutencao = new Manutencao(
-                UUID.randomUUID().toString(),
-                idMoto,
-                usuario.getUid(),
-                tipo,
-                descricao,
-                dataBanco,
-                quilometragem,
-                valorNormalizado,
-                false
-        );
+        Manutencao manutencao;
 
-        boolean salvo = manutencaoDao.inserir(manutencao);
+        boolean salvo;
+
+        if (idManutencaoEdicao != null
+                && !idManutencaoEdicao.trim().isEmpty()) {
+
+            Manutencao existente =
+                    manutencaoDao.buscarPorId(idManutencaoEdicao);
+
+            if (existente == null
+                    || !idMoto.equals(existente.getIdMoto())
+                    || !usuario.getUid().equals(existente.getUidUsuario())) {
+
+                Toast.makeText(
+                        this,
+                        "Não foi possível atualizar essa manutenção.",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                return;
+            }
+
+            manutencao = new Manutencao(
+                    existente.getId(),
+                    existente.getIdMoto(),
+                    existente.getUidUsuario(),
+                    tipo,
+                    descricao,
+                    dataBanco,
+                    quilometragem,
+                    valorNormalizado,
+                    false
+            );
+
+            salvo = manutencaoDao.atualizar(manutencao);
+
+        } else {
+
+            manutencao = new Manutencao(
+                    UUID.randomUUID().toString(),
+                    idMoto,
+                    usuario.getUid(),
+                    tipo,
+                    descricao,
+                    dataBanco,
+                    quilometragem,
+                    valorNormalizado,
+                    false
+            );
+
+            salvo = manutencaoDao.inserir(manutencao);
+        }
 
         if (salvo) {
 
-            Toast.makeText(
-                    this,
-                    "Manutenção salva com sucesso!",
-                    Toast.LENGTH_SHORT
-            ).show();
+            String mensagem = idManutencaoEdicao != null
+                    && !idManutencaoEdicao.trim().isEmpty()
+                    ? "Manutenção atualizada com sucesso!"
+                    : "Manutenção salva com sucesso!";
 
-            finish();
+            databaseReference
+                    .child(usuario.getUid())
+                    .child("manutencoes")
+                    .child(manutencao.getId())
+                    .setValue(manutencao)
+                    .addOnCompleteListener(task -> {
+
+                        if (task.isSuccessful()) {
+
+                            manutencaoDao.marcarComoSincronizada(
+                                    manutencao.getId()
+                            );
+
+                            Toast.makeText(
+                                    CadastroManutencaoActivity.this,
+                                    mensagem + " Sincronizada com o Firebase.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                        } else {
+
+                            Toast.makeText(
+                                    CadastroManutencaoActivity.this,
+                                    mensagem + " A sincronização falhou. "
+                                            + "O registro continua salvo no aparelho.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
+
+                        finish();
+                    });
 
         } else {
 

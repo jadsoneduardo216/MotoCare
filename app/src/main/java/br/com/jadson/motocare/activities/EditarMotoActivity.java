@@ -1,5 +1,7 @@
+
 package br.com.jadson.motocare.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -31,7 +33,6 @@ public class EditarMotoActivity extends AppCompatActivity {
     private TextView btnSalvarAlteracoesMoto;
 
     private MotoDao motoDao;
-
     private SharedPreferences preferences;
 
     private FirebaseAuth firebaseAuth;
@@ -45,7 +46,6 @@ public class EditarMotoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_editar_moto);
 
         inicializarViews();
@@ -64,12 +64,10 @@ public class EditarMotoActivity extends AppCompatActivity {
                 .getReference("usuarios");
 
         configurarBotoes();
-
         carregarMotocicleta();
     }
 
     private void inicializarViews() {
-
         btnVoltarEditarMoto =
                 findViewById(R.id.btnVoltarEditarMoto);
 
@@ -96,7 +94,6 @@ public class EditarMotoActivity extends AppCompatActivity {
     }
 
     private void configurarBotoes() {
-
         btnVoltarEditarMoto.setOnClickListener(
                 v -> finish()
         );
@@ -107,16 +104,12 @@ public class EditarMotoActivity extends AppCompatActivity {
     }
 
     private void carregarMotocicleta() {
+        String idMotoAtiva = preferences.getString(
+                KEY_MOTO_ATIVA,
+                null
+        );
 
-        String idMotoAtiva =
-                preferences.getString(
-                        KEY_MOTO_ATIVA,
-                        null
-                );
-
-        if (idMotoAtiva == null
-                || idMotoAtiva.trim().isEmpty()) {
-
+        if (idMotoAtiva == null || idMotoAtiva.trim().isEmpty()) {
             Toast.makeText(
                     this,
                     "Nenhuma motocicleta selecionada.",
@@ -124,15 +117,12 @@ public class EditarMotoActivity extends AppCompatActivity {
             ).show();
 
             finish();
-
             return;
         }
 
-        motoAtual =
-                motoDao.buscarPorId(idMotoAtiva);
+        motoAtual = motoDao.buscarPorId(idMotoAtiva);
 
         if (motoAtual == null) {
-
             Toast.makeText(
                     this,
                     "Não foi possível encontrar a motocicleta.",
@@ -140,7 +130,6 @@ public class EditarMotoActivity extends AppCompatActivity {
             ).show();
 
             finish();
-
             return;
         }
 
@@ -148,159 +137,88 @@ public class EditarMotoActivity extends AppCompatActivity {
     }
 
     private void preencherCampos() {
-
-        edtApelidoEditar.setText(
-                motoAtual.getApelido()
-        );
-
-        edtMarcaEditar.setText(
-                motoAtual.getMarca()
-        );
-
-        edtModeloEditar.setText(
-                motoAtual.getModelo()
-        );
-
-        edtAnoEditar.setText(
-                motoAtual.getAno()
-        );
-
-        edtPlacaEditar.setText(
-                motoAtual.getPlaca()
-        );
-
+        edtApelidoEditar.setText(motoAtual.getApelido());
+        edtMarcaEditar.setText(motoAtual.getMarca());
+        edtModeloEditar.setText(motoAtual.getModelo());
+        edtAnoEditar.setText(motoAtual.getAno());
+        edtPlacaEditar.setText(motoAtual.getPlaca());
         edtQuilometragemEditar.setText(
                 motoAtual.getQuilometragem()
         );
     }
 
     private void salvarAlteracoes() {
+        String apelido = edtApelidoEditar.getText()
+                .toString().trim();
 
-        String apelido =
-                edtApelidoEditar.getText()
-                        .toString()
-                        .trim();
+        String marca = edtMarcaEditar.getText()
+                .toString().trim();
 
-        String marca =
-                edtMarcaEditar.getText()
-                        .toString()
-                        .trim();
+        String modelo = edtModeloEditar.getText()
+                .toString().trim();
 
-        String modelo =
-                edtModeloEditar.getText()
-                        .toString()
-                        .trim();
+        String ano = edtAnoEditar.getText()
+                .toString().trim();
 
-        String ano =
-                edtAnoEditar.getText()
-                        .toString()
-                        .trim();
+        String placa = edtPlacaEditar.getText()
+                .toString().trim().toUpperCase();
 
-        String placa =
-                edtPlacaEditar.getText()
-                        .toString()
-                        .trim()
-                        .toUpperCase();
-
-        String quilometragem =
-                edtQuilometragemEditar.getText()
-                        .toString()
-                        .trim();
-
-        // =========================
-        // VALIDAÇÕES
-        // =========================
+        String quilometragem = edtQuilometragemEditar.getText()
+                .toString().trim();
 
         if (apelido.isEmpty()) {
-
             edtApelidoEditar.setError(
                     "Informe um apelido para sua moto"
             );
-
             edtApelidoEditar.requestFocus();
-
             return;
         }
 
         if (marca.isEmpty()) {
-
-            edtMarcaEditar.setError(
-                    "Informe a marca"
-            );
-
+            edtMarcaEditar.setError("Informe a marca");
             edtMarcaEditar.requestFocus();
-
             return;
         }
 
         if (modelo.isEmpty()) {
-
-            edtModeloEditar.setError(
-                    "Informe o modelo"
-            );
-
+            edtModeloEditar.setError("Informe o modelo");
             edtModeloEditar.requestFocus();
-
             return;
         }
 
         if (ano.isEmpty()) {
-
-            edtAnoEditar.setError(
-                    "Informe o ano"
-            );
-
+            edtAnoEditar.setError("Informe o ano");
             edtAnoEditar.requestFocus();
-
             return;
         }
 
         if (placa.isEmpty()) {
-
-            edtPlacaEditar.setError(
-                    "Informe a placa"
-            );
-
+            edtPlacaEditar.setError("Informe a placa");
             edtPlacaEditar.requestFocus();
-
             return;
         }
 
         if (quilometragem.isEmpty()) {
-
             edtQuilometragemEditar.setError(
                     "Informe a quilometragem atual"
             );
-
             edtQuilometragemEditar.requestFocus();
-
             return;
         }
-
-        // =========================
-        // USUÁRIO LOGADO
-        // =========================
 
         FirebaseUser usuarioAtual =
                 firebaseAuth.getCurrentUser();
 
         if (usuarioAtual == null) {
-
             Toast.makeText(
                     this,
                     "Nenhum usuário está logado.",
                     Toast.LENGTH_LONG
             ).show();
-
             return;
         }
 
-        String uid =
-                usuarioAtual.getUid();
-
-        // =========================
-        // ATUALIZA OBJETO
-        // =========================
+        String uid = usuarioAtual.getUid();
 
         motoAtual.setApelido(apelido);
         motoAtual.setMarca(marca);
@@ -309,33 +227,18 @@ public class EditarMotoActivity extends AppCompatActivity {
         motoAtual.setPlaca(placa);
         motoAtual.setQuilometragem(quilometragem);
 
-        // =========================
-        // SALVA NO SQLITE
-        // =========================
-
-        boolean atualizado =
-                motoDao.atualizar(motoAtual);
+        boolean atualizado = motoDao.atualizar(motoAtual);
 
         if (!atualizado) {
-
             Toast.makeText(
                     this,
                     "Não foi possível atualizar a motocicleta.",
                     Toast.LENGTH_LONG
             ).show();
-
             return;
         }
 
-        // =========================
-        // DESABILITA BOTÃO
-        // =========================
-
         btnSalvarAlteracoesMoto.setEnabled(false);
-
-        // =========================
-        // ENVIA PARA O FIREBASE
-        // =========================
 
         databaseReference
                 .child(uid)
@@ -343,38 +246,35 @@ public class EditarMotoActivity extends AppCompatActivity {
                 .child(motoAtual.getId())
                 .setValue(motoAtual)
                 .addOnCompleteListener(task -> {
-
                     btnSalvarAlteracoesMoto.setEnabled(true);
 
                     if (task.isSuccessful()) {
-
-                        // Firebase confirmou a alteração.
-                        // Agora marcamos a moto como sincronizada.
-
                         motoDao.marcarComoSincronizada(
                                 motoAtual.getId()
                         );
 
                         Toast.makeText(
-                                this,
+                                EditarMotoActivity.this,
                                 "Motocicleta atualizada com sucesso!",
                                 Toast.LENGTH_LONG
                         ).show();
 
+                        Intent intent = new Intent(
+                                EditarMotoActivity.this,
+                                MainActivity.class
+                        );
+
+                        intent.addFlags(
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                        | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        );
+
+                        startActivity(intent);
                         finish();
 
                     } else {
-
-                        /*
-                         * A alteração continua salva no SQLite.
-                         *
-                         * Como MotoDao.atualizar()
-                         * colocou sincronizado = 0,
-                         * poderemos sincronizar posteriormente.
-                         */
-
                         Toast.makeText(
-                                this,
+                                EditarMotoActivity.this,
                                 "Alteração salva no aparelho. "
                                         + "Não foi possível sincronizar com a nuvem.",
                                 Toast.LENGTH_LONG
@@ -387,11 +287,9 @@ public class EditarMotoActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
 
         if (motoDao != null) {
-
             motoDao.fechar();
         }
     }

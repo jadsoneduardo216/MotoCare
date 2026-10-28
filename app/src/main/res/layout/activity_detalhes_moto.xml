@@ -143,7 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="PLACA"
-                android:textColor="@color/primary_green"
+                android:textColor="@color/accent"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -212,6 +212,19 @@
             android:background="@drawable/bg_button_primary"
             android:gravity="center"
             android:text="+  ADICIONAR MANUTENÇÃO"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- BOTÃO VER HISTÓRICO DE MANUTENÇÕES -->
+        <TextView
+            android:id="@+id/btnHistoricoManutencoes"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:text="▤  VER HISTÓRICO DE MANUTENÇÕES"
             android:textColor="@color/white"
             android:textSize="15sp"
             android:textStyle="bold" />

@@ -203,6 +203,12 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
+        <!-- ESPAÇO EXTRA PARA ROLAR COM O TECLADO ABERTO -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:importantForAccessibility="no" />
+
     </LinearLayout>
 
 </ScrollView>
