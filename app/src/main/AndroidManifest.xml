@@ -66,6 +66,22 @@
             android:name=".activities.HistoricoManutencoesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Tela de troca de óleo -->
+        <activity
+            android:name=".activities.TrocaOleoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".activities.HistoricoTrocasOleoActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".activities.RelatorioManutencoesActivity"
+            android:exported="false" />
+
+
     </application>
 
 </manifest>
