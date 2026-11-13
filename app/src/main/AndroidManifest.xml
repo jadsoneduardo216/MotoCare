@@ -81,6 +81,10 @@
             android:name=".activities.RelatorioManutencoesActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".activities.AlertasActivity"
+            android:exported="false" />
+
 
     </application>
 

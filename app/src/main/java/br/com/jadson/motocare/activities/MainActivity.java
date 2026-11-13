@@ -223,13 +223,26 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnAlertas.setOnClickListener(v ->
+        btnAlertas.setOnClickListener(v -> {
+
+            if (motosUsuario == null || motosUsuario.isEmpty()) {
+
                 Toast.makeText(
                         MainActivity.this,
-                        "Vamos configurar a tela de alertas.",
+                        "Cadastre uma motocicleta primeiro.",
                         Toast.LENGTH_SHORT
-                ).show()
-        );
+                ).show();
+
+                return;
+            }
+
+            Intent intent = new Intent(
+                    MainActivity.this,
+                    AlertasActivity.class
+            );
+
+            startActivity(intent);
+        });
     }
 
     /**
